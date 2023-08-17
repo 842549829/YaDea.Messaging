@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>YaDea.Messaging</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="7.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\YaDea.Messaging.Domain\YaDea.Messaging.Domain.csproj" />
+    <ProjectReference Include="..\YaDea.Messaging.Application.Contracts\YaDea.Messaging.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
