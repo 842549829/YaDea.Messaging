@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.Data;
+using YaDea.Messaging.BackgroundJobArgs;
 using YaDea.Messaging.Entities;
 using YaDea.Messaging.Managers;
 using YaDea.Messaging.Models;
@@ -84,10 +86,22 @@ namespace YaDea.Messaging.Publishers
         /// </summary>
         /// <param name="message">消息</param>
         /// <returns>标识一个异步</returns>
-        private Task DelayPushAsync(Message message)
+        private async Task DelayPushAsync(Message message)
         {
-            // 可将任务放到对应的调度作业中去
-            throw new NotImplementedException();
+            var jobId = await _backgroundJobManager.EnqueueAsync(
+                new MessagePushingArgs
+                {
+                    Id = message.Id.ToString(),
+                    Title = message.Title,
+                    Content = message.Content,
+                    Scopes = message.Scopes.Select(MapToMessageScopeModel).ToArray(),
+                    ProviderCode = message.PushProviderCode
+                }, delay: message.SendTime - DateTime.Now);
+
+            // 添加后台工作Id，用于取消发送的标识
+            message.SetProperty("DelayedSendJobIds", jobId);
+
+            await _messageManager.UpdateAsync(message);
         }
 
         /// <summary>

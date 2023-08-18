@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Services;
 using YaDea.Messaging.Entities;
@@ -25,5 +26,12 @@ namespace YaDea.Messaging.Managers
         /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>返回消息</returns>
         Task<Message> UpdateAsync(Message message, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// 查询消息
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns>消息</returns>
+        Task<Message> GetAsync(Guid id);
     }
 }

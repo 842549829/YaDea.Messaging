@@ -54,6 +54,16 @@ namespace YaDea.Messaging.Managers
         }
 
         /// <summary>
+        /// 查询消息
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns>消息</returns>
+        public Task<Message> GetAsync(Guid id)
+        {
+            return _messageRepository.GetAsync(id);
+        }
+
+        /// <summary>
         /// 消息验证
         /// </summary>
         /// <param name="message">消息实体</param>

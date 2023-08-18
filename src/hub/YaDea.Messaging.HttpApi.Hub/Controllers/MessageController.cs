@@ -38,8 +38,8 @@ namespace YaDea.Messaging.Controllers
                 PushProviderCode = PushProviderCode.System,
                 Title = input.Title,
                 Content = input.Content,
-                DelayedSend = false,
-                SendTime = null,
+                DelayedSend = true,
+                SendTime = DateTime.Now.AddMinutes(5),
                 SendUserId = Guid.NewGuid(),
                 SendUserName = "测试",
                 Scopes = new[]
