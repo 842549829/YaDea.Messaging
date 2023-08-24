@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sample.Api.Responses;
 using YaDea.Messaging.Identity.Models.Requests;
 using YaDea.Messaging.Identity.Services;
@@ -83,6 +84,13 @@ namespace YaDea.Messaging.Identity.Controllers
                 ExpiresIn = result.ExpiresIn,
                 RefreshToken = result.RefreshToken
             });
+        }
+
+        [HttpGet("Test")]
+        [Authorize]
+        public string Get()
+        {
+            return "身份认证成功返回数据";
         }
     }
 }
