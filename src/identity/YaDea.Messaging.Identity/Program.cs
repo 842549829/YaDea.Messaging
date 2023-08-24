@@ -26,6 +26,14 @@ namespace YaDea.Messaging.Identity
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
             // ◊¢≤·Identity
+            //services.AddIdentity<AppUser, AppRole>(options =>
+            //{
+            //    // ≈‰÷√√‹¬ÎπÊ‘Ú
+            //    options.Password.RequireDigit = true;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //}).AddEntityFrameworkStores<AppDbContext>();
             services.AddIdentityCore<AppUser>(options =>
             {
                 // ≈‰÷√√‹¬ÎπÊ‘Ú
