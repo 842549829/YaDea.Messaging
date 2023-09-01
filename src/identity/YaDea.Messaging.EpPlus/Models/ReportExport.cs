@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using static YaDea.Messaging.EpPlus.Extension.ExcelExtend;
+using YaDea.Messaging.EpPlus.Extension;
 
 namespace YaDea.Messaging.EpPlus.Models
 {

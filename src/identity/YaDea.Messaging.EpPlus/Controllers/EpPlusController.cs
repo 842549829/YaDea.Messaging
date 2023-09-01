@@ -45,5 +45,33 @@ namespace YaDea.Messaging.EpPlus.Controllers
             };
             return Task.FromResult(fileContentResult);
         }
+
+        /// <summary>
+        /// Excl导出(标题)
+        /// </summary>
+        /// <returns>结果</returns>
+        [HttpGet("t1")]
+        public Task<FileContentResult> ExportT1Async()
+        {
+            var reports = ExcelExtend.ModelExportEPPlusExcel(new List<ReportExport>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Number = 12,
+                    NumberNull = null,
+                    Status = Status.Success,
+                    StatusNull = null,
+                    Str = "上升到水电费",
+                    Time = DateTime.Now,
+                    TimeNull = DateTime.Now
+                }
+            });
+            var fileContentResult = new FileContentResult(reports, "application/vnd.ms-excel")
+            {
+                FileDownloadName = "名称"
+            };
+            return Task.FromResult(fileContentResult);
+        }
     }
 }

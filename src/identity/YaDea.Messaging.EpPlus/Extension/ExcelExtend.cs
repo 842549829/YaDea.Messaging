@@ -1,8 +1,14 @@
 ﻿using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
+using Microsoft.OpenApi.Extensions;
+using System.Collections;
+using System;
 
 namespace YaDea.Messaging.EpPlus.Extension
 {
@@ -166,10 +172,10 @@ namespace YaDea.Messaging.EpPlus.Extension
             var worksheet = excelPackage.Workbook.Worksheets[0];
             worksheet.Cells.Style.Font.Size = 11f;
             var array = list.First().GetType().GetProperties().Where(p => !Attribute.IsDefined(p, typeof(ExportIgnoreAttribute))).ToArray();
-            worksheet.Cells["A1"].LoadFromCollection<T>(list, true, TableStyles.None, BindingFlags.Instance | BindingFlags.Public, array);
+            worksheet.Cells["A1"].LoadFromCollection(list, true, TableStyles.None, BindingFlags.Instance | BindingFlags.Public, array);
             worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column].Style.Font.Bold = true;
             var source = new List<int>();
-            for (var index1 = 0; index1 < array.Count(); ++index1)
+            for (var index1 = 0; index1 < array.Length; ++index1)
             {
                 var propertyInfo = array[index1];
                 var cell = worksheet.Cells[2, index1 + 1, worksheet.Dimension.End.Row, index1 + 1];
@@ -232,10 +238,81 @@ namespace YaDea.Messaging.EpPlus.Extension
 
         public static bool IsNullableEnum(this Type t) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>) && t.GetGenericArguments()[0].IsEnum;
 
-
-        public class ExportIgnoreAttribute : Attribute
+        public static void Merge(this ExcelRangeBase range)
         {
+            ExcelCellAddress start = range.Start;
+            ExcelCellAddress end = range.End;
+            range.Worksheet.Cells[start.Row, start.Column, end.Row, end.Column].Merge = true;
         }
 
+        /// <summary>
+        /// 自定义表头
+        /// </summary>
+        public static byte[] ModelExportEPPlusExcel<T>(List<T> list)
+        {
+            try
+            {
+                if (list == null || list.Count == 0)
+                {
+                    throw new ArgumentNullException(nameof(list));
+                }
+
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+                using var package = new ExcelPackage();
+                //添加worksheet
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                //添加表头
+                //worksheet.Cells[开始行, 开始列, 结束行, 结束列].Merge = true;
+                worksheet.Cells[1, 1, 1, 8].Merge = true;
+                worksheet.Cells[1, 1, 1, 8].Value = "标题";
+                worksheet.Cells[1, 1, 1, 8].Style.Font.Bold = true;
+                worksheet.Cells[1, 1, 1, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[1, 1, 1, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 1, 1, 8].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(159, 197, 232));
+                worksheet.Cells[1, 1, 1, 8].Style.Font.Size = 18;
+
+                var column = 1;
+                foreach (var property in typeof(T).GetProperties())
+                {
+                    worksheet.Cells[2, column].Value = property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? "Id";//可以只保留这个，不加央视，导出速度也会加快
+                    worksheet.Cells[2, column].Style.Font.Bold = true;//字体为粗体
+                    worksheet.Cells[2, column].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;//水平居中
+                    worksheet.Cells[2, column].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;//设置样式类型
+                    worksheet.Cells[2, column].Style.Border.Bottom.Style = ExcelBorderStyle.Hair;
+                    worksheet.Cells[2, column].Style.Border.Top.Style = ExcelBorderStyle.Hair;
+                    worksheet.Cells[2, column].Style.Border.Right.Style = ExcelBorderStyle.Hair;
+                    worksheet.Cells[2, column].Style.Border.Left.Style = ExcelBorderStyle.Hair;
+                    column++;
+                }
+
+                //添加数据
+                var row = 3;
+                foreach (var ob in list)
+                {
+                    var col = 1;
+                    foreach (var property in ob.GetType().GetRuntimeProperties())
+                    {
+                        worksheet.Cells[row, col].Value = property.GetValue(ob);//这里已知可以减少一层循环，速度会上升
+                        col++;
+                    }
+                    row++;
+                }
+
+                //自动列宽，由于自动列宽大数据导出严重影响速度，我这里就不开启了，大家可以根据自己情况开启
+                //worksheet.Cells.AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw ;
+            }
+
+        }
+    }
+
+    public class ExportIgnoreAttribute : Attribute
+    {
     }
 }
