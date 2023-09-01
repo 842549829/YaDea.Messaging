@@ -67,7 +67,7 @@ namespace YaDea.Messaging.Identity
                     };
                 });
 
-            // Add services to the container.
+            // ×¢²áÊÚÈ¨
             services.AddAuthorization();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
